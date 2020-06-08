@@ -22,8 +22,8 @@
 #define manuPin 13
 
 //Système anti-collision
-#define trigPin1 3
-#define echoPin1 2
+#define trigPin1 2
+#define echoPin1 3
 #define obstLedPin 11 //fake addressing, just to keep a number
 #define freeLedPin 12
 
@@ -144,7 +144,7 @@ void loop() {
   //Système anti-collision
   SonarSensor(trigPin1, echoPin1);
   UltraSensor = distance;
-  //Serial.println(UltraSensor);
+  Serial.println(UltraSensor);
 
   // Read button - Debounce
   if (digitalRead(manuAutoPB) == true) {
@@ -307,4 +307,3 @@ void loop() {
     }
     
   }
-
