@@ -10,9 +10,9 @@ AF_DCMotor motor3ArriereDroite(3);
 AF_DCMotor motor4ArriereGauche(4);
 
 //Système anti-collision
-#define trigPin1 2
-#define echoPin1 3
-#define obstLedPin 11 //fake addressing, just to keep a number
+#define trigPin1 7
+#define echoPin1 4
+#define obstLedPin 8
 #define freeLedPin 12
 
 long duration, distance, UltraSensor, distance_securite = 10;
@@ -109,13 +109,18 @@ void loop() {
   SonarSensor(trigPin1, echoPin1);
   UltraSensor = distance;
   Serial.println(UltraSensor);
-
-  // If button is pressed - change Manual/Auto State
-  if (UltraSensor > distance_securite) { // Auto Mode
-    //digitalWrite(autoPin, HIGH);
-    //digitalWrite(manuPin, LOW);
-    //stopme();
-     }
+     
+  
+    if(UltraSensor > distance_securite){ //on avance
+      digitalWrite(obstLedPin, LOW);
+      digitalWrite(freeLedPin, HIGH);
+      
+    }else{ //on arrete
+      digitalWrite(obstLedPin, HIGH);
+      digitalWrite(freeLedPin, LOW);
+      //stopme();
+    }
+   
   if(Serial.available()){
       getstr = Serial.read();
       Serial.println(getstr);
@@ -133,13 +138,6 @@ void loop() {
   }
 
  
-  /*
-    if(UltraSensor > distance_securite){ //on avance
-      
-    }else{ //on arrete
-      stopme();
-    }
-   */
   
 }
 
