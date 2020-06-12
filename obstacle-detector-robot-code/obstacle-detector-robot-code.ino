@@ -10,12 +10,12 @@ AF_DCMotor motor3ArriereDroite(3);
 AF_DCMotor motor4ArriereGauche(4);
 
 //Système anti-collision
-#define trigPin1 7
-#define echoPin1 4
-#define obstLedPin 8
-#define freeLedPin 12
+#define trigPin1 10
+#define echoPin1 9
+#define obstLedPin 2
+#define freeLedPin 13
 
-long duration, distance, UltraSensor, distance_securite = 10;
+long duration, distance, UltraSensor, distance_securite = 30;
 
 int motorSpeedA = 0;
 int motorSpeedB = 0;
@@ -23,7 +23,7 @@ int motorSpeedB = 0;
 boolean buttonState = LOW;
 int ManuAutoState = 0; // 0 == Manual and 1 == Auto
 int pressed = false;
-
+int AlertState = 0;
 
 unsigned char carSpeed = 255;
 char getstr;
@@ -50,16 +50,16 @@ void back(){
 
 void left(){  
   motor1AvantDroite.run(FORWARD);
-  motor2AvantGauche.run(BACKWARD);
+  motor2AvantGauche.run(RELEASE);
   motor3ArriereDroite.run(FORWARD);
-  motor4ArriereGauche.run(BACKWARD);
+  motor4ArriereGauche.run(RELEASE);
   Serial.println("Left");
   }
 
 void right() {
-  motor1AvantDroite.run(BACKWARD);
+  motor1AvantDroite.run(RELEASE);
   motor2AvantGauche.run(FORWARD);
-  motor3ArriereDroite.run(BACKWARD);
+  motor3ArriereDroite.run(RELEASE);
   motor4ArriereGauche.run(FORWARD);
   Serial.println("Right");
   }
@@ -70,7 +70,7 @@ void right() {
   motor2AvantGauche.run(RELEASE);
   motor3ArriereDroite.run(RELEASE);
   motor4ArriereGauche.run(RELEASE);
-  Serial.println("Right");
+  Serial.println("STOP");
 }
 
 
@@ -110,34 +110,52 @@ void loop() {
   UltraSensor = distance;
   Serial.println(UltraSensor);
      
-  
-    if(UltraSensor > distance_securite){ //on avance
+    //if(UltraSensor > distance_securite and AlertState == 1){ //on avance
+    
+    if(AlertState == 1){ //on avance
+    
+      if(UltraSensor > distance_securite){ //on avance
+        digitalWrite(obstLedPin, LOW);
+        digitalWrite(freeLedPin, HIGH);
+        
+      }else{ //on arrete
+        digitalWrite(obstLedPin, HIGH);
+        digitalWrite(freeLedPin, LOW);
+        //stopme();
+      }
+    }else{
       digitalWrite(obstLedPin, LOW);
       digitalWrite(freeLedPin, HIGH);
       
-    }else{ //on arrete
-      digitalWrite(obstLedPin, HIGH);
-      digitalWrite(freeLedPin, LOW);
-      //stopme();
     }
-   
-  if(Serial.available()){
-      getstr = Serial.read();
-      Serial.println(getstr);
       
-      switch(getstr){
-        /*case 'd': forward();delay(100);forward();left(); break;
-        case 'g': back();  delay(100); back();left();  break;*/
-        case 'd': right(); break;
-        case 'g': left(); break;
-        case 'a': forward(); break;
-        case 'r': back();  break;
-        case 's': stopme();  break;
-        default:  break;
-        }
-  }
-
  
+   
+      if(Serial.available()){
+          getstr = Serial.read();
+          Serial.println(getstr);
+          
+          switch(getstr){
+            /*case 'd': forward();delay(100);forward();left(); break;
+            case 'g': back();  delay(100); back();left();  break;*/
+            case 'd': right(); break;
+            case 'g': left(); break;
+            case 'a': forward(); break;
+            case 'r': back();  break;
+            case 's': stopme();  break;
+            
+            
+            case 'o': AlertState = 1; break;
+            case 'f': AlertState = 0; break;
+            case 'k': 
+              digitalWrite(obstLedPin, HIGH);
+              delay(500);
+              digitalWrite(obstLedPin, LOW);
+            default:  break;
+            }
+      }
+
+    
   
 }
 
